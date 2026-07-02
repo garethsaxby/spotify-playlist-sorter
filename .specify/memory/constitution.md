@@ -1,9 +1,14 @@
 <!--
 Sync Impact Report
 ==================
-Version change: (unratified template) → 1.0.0
-Bump rationale: Initial ratification — placeholder template replaced with concrete,
-project-specific governance. First adopted version under semantic versioning.
+Version change: 1.0.0 → 1.0.1 (PATCH amendment; initial ratification was
+  (unratified template) → 1.0.0)
+Bump rationale (v1.0.1): Wording clarification of the dependency-"pinning" requirement in
+  Principle V and Quality Gates — reproducibility MUST be delivered via a committed
+  lockfile; declared specifiers MAY be floors when a lockfile pins the resolution. Intent
+  (identical versions everywhere) is unchanged, so PATCH. Resolves analyze finding C1.
+Bump rationale (v1.0.0): Initial ratification — placeholder template replaced with
+  concrete, project-specific governance. First adopted version under semantic versioning.
 
 Modified principles: N/A (initial definition)
 Added principles:
@@ -113,8 +118,10 @@ Handling user credentials and untrusted remote data demands defensive-by-default
   `eval`/`exec` on dynamic input, and unchecked `None` access.
 - Case handling MUST be explicit and total; prefer immutable data and exhaustive
   branches over implicit fall-through.
-- All runtime and development dependencies MUST be pinned so every environment is
-  reproducible.
+- All runtime and development dependencies MUST be reproducibly locked — exact resolved
+  versions captured in a committed lockfile — so every environment installs identical
+  versions; declared specifiers MAY be floors (`>=`) when a committed lockfile pins the
+  resolution.
 
 **Rationale**: The tool holds a user's OAuth credentials and acts on their account;
 a safety lapse is not a style nit but a security and privacy failure.
@@ -128,8 +135,9 @@ merge-ready.
   strict type check — with a zero exit code before merge.
 - The main branch MUST remain in a clean, passing baseline at all times; a change may
   not leave any of the three checks failing.
-- Linter, formatter, and type-checker versions MUST be declared as pinned development
-  dependencies so every developer and automated environment runs identical checks.
+- Linter, formatter, and type-checker versions MUST be reproducibly pinned — declared as
+  development dependencies and locked via a committed lockfile (`uv.lock`) — so every
+  developer and automated environment runs identical checks.
 - All quality-tooling configuration MUST reside in `pyproject.toml`; non-source paths
   (virtual environments, caches, build/generated/vendored artifacts) MUST be excluded
   from all checks.
@@ -161,4 +169,4 @@ convenience, the rule wins unless it is formally amended.
   in `CLAUDE.md` and the active feature plan; this constitution governs the
   non-negotiable rules those documents operate under.
 
-**Version**: 1.0.0 | **Ratified**: 2026-07-02 | **Last Amended**: 2026-07-02
+**Version**: 1.0.1 | **Ratified**: 2026-07-02 | **Last Amended**: 2026-07-02

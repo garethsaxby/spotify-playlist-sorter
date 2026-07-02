@@ -3,3 +3,64 @@ name = "spotify-playlist-sorter"
 version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = []
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.6.0",
+    "ruff>=0.15.20",
+    "ty>=0.0.56",
+]
+
+[tool.ruff]
+# Target the project's declared Python version (FR-009).
+target-version = "py314"
+line-length = 88
+# Non-source paths excluded from linting and formatting (FR-010). Ruff also respects
+# .gitignore by default; these are explicit for clarity and CI robustness.
+extend-exclude = [".venv", "build", "dist", "__pycache__"]
+
+[tool.ruff.lint]
+# Strict, broad coverage: enable everything, then subtract a small, justified set (FR-002).
+select = ["ALL"]
+ignore = [
+    # --- Formatter-conflict set: the Ruff formatter owns layout (FR-003) ---
+    "W191",   # tab indentation — formatter decides indentation
+    "E111",   # indentation not a multiple of four — formatter-owned
+    "E114",   # indentation not a multiple of four (comment) — formatter-owned
+    "E117",   # over-indented — formatter-owned
+    "D206",   # docstring indented with spaces — formatter-owned
+    "D300",   # triple single quotes — formatter-owned
+    "Q000",   # bad quotes (inline) — formatter-owned
+    "Q001",   # bad quotes (multiline) — formatter-owned
+    "Q002",   # bad quotes (docstring) — formatter-owned
+    "Q003",   # avoidable escaped quote — formatter-owned
+    "COM812", # missing trailing comma — formatter-owned
+    "COM819", # prohibited trailing comma — formatter-owned
+    "ISC001", # single-line implicit string concatenation — formatter-owned
+    "ISC002", # multi-line implicit string concatenation — formatter-owned
+    # --- Project set: intentionally disabled (research.md D1) ---
+    "D",   # pydocstyle — docstrings-everywhere is premature on a near-empty baseline
+    "CPY", # flake8-copyright — no copyright-header policy for this repo
+    "TD",  # flake8-todos — TODO comments are permitted, not merge blockers
+    "FIX", # flake8-fixme — FIXME/TODO markers are permitted
+]
+
+[tool.ruff.format]
+# Canonical, deterministic style (FR-003); the formatter is authoritative for layout.
+quote-style = "double"
+indent-style = "space"
+
+[tool.ty.environment]
+# Analyze against the project's declared Python version (FR-009).
+python-version = "3.14"
+
+[tool.ty.src]
+# Exclude non-source paths from type checking (FR-010). ty also respects .gitignore.
+exclude = [".venv", "build", "dist", "__pycache__"]
+
+[tool.ty.rules]
+# Strict posture (FR-004): the `typecheck` recipe runs with `--error-on-warning`, so any
+# warning-level diagnostic is fatal. Reference-resolution issues are elevated to hard
+# errors here as well. Individual findings may be downgraded ONLY with a justification
+# comment (FR-008); none are currently downgraded.
+possibly-unresolved-reference = "error"
