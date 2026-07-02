@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "extensions": {
+    "agent-context": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:9a1dc02d2d0139bb03860392ecacef79183be2c442feda2f9ccaa4e5907b1e47",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.agent-context.update"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-02T16:15:33.721774+00:00"
+    },
+    "branch-convention": {
+      "version": "1.0.0",
+      "source": "local",
+      "manifest_hash": "sha256:7efe1bfce264c25a4eddce6d65aa74ebc63a532b82e2d82264155e82c39d3859",
+      "enabled": true,
+      "priority": 10,
+      "registered_commands": {
+        "claude": [
+          "speckit.branch-convention.configure",
+          "speckit.branch-convention.validate",
+          "speckit.branch-convention.rename"
+        ]
+      },
+      "registered_skills": [],
+      "installed_at": "2026-07-02T16:16:56.749229+00:00"
+    }
+  }
+}

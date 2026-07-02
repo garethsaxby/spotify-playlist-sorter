@@ -1,0 +1,19 @@
+# .specify/branch-convention.yml
+# Branch and spec-folder naming convention for /specify (preset: gitflow)
+convention:
+  branch_pattern: "{type}/{seq}-{kebab}"
+  folder_pattern: "{seq}-{kebab}"
+  type_prefix:
+    feature: "feat"
+    bugfix: "fix"
+    hotfix: "hotfix"
+    refactor: "refactor"
+    docs: "docs"
+  default_type: "feat"
+  seq_padding: 3
+  seq_start: 1
+  date_format: "YYYYMMDD"
+  ticket_pattern: "[A-Z]+-[0-9]+"
+  max_length: 60
+  separator: "-"
+  lowercase: true
