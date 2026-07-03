@@ -51,7 +51,7 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.ty.environment]
-# Analyze against the project's declared Python version (FR-009).
+# Analyse against the project's declared Python version (FR-009).
 python-version = "3.14"
 
 [tool.ty.src]
