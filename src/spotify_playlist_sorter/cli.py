@@ -1,4 +1,4 @@
-"""Command-line interface: ``login`` and ``sort`` commands."""
+"""Command-line interface: ``login``, ``sort``, and ``edit`` commands."""
 
 from __future__ import annotations
 
@@ -6,13 +6,21 @@ import argparse
 from dataclasses import replace
 from typing import TYPE_CHECKING
 
-from . import auth, config, display
+from . import arrange, auth, config, display, store
+from .models import EditorState
 from .reccobeats import ReccoBeatsClient, ReccoBeatsError
 from .sorter import build_proposed_order
 from .spotify import SpotifyClient, SpotifyError, parse_playlist_id
+from .tui import TrackEditorApp
 
 if TYPE_CHECKING:
-    from .models import AudioFeatures, ProposedOrder, SourcePlaylist, Track
+    from .models import (
+        AudioFeatures,
+        Correction,
+        ProposedOrder,
+        SourcePlaylist,
+        Track,
+    )
 
 _MIN_TRACKS = 2
 
@@ -42,6 +50,10 @@ def _build_parser() -> argparse.ArgumentParser:
     sort_parser.add_argument(
         "--public", action="store_true", help="Make the new playlist public"
     )
+    edit_parser = sub.add_parser(
+        "edit", help="Interactively edit a playlist's keys/BPM and order"
+    )
+    edit_parser.add_argument("playlist", help="Spotify playlist URL, URI, or id")
     return parser
 
 
@@ -146,6 +158,64 @@ def _cmd_sort(args: argparse.Namespace) -> int:
         recco.close()
 
 
+def _run_edit(playlist_id: str, spotify: SpotifyClient, recco: ReccoBeatsClient) -> int:
+    display.message("Fetching playlist and estimates…")
+    user_id = spotify.current_user_id()
+    source = spotify.get_playlist(playlist_id)
+    if source.owner_id != user_id:
+        display.message("[red]You can only edit playlists you own.[/]")
+        return _EXIT_NOT_OWNED
+    if len(source.tracks) < _MIN_TRACKS:
+        display.message("Nothing to arrange (playlist has fewer than 2 tracks).")
+        return _EXIT_TOO_FEW
+    estimates = recco.fetch_features([track.spotify_id for track in source.tracks])
+    warnings: list[str] = []
+    corrections = store.load_corrections(warnings.append)
+    saved = store.load_arrangement(playlist_id, warnings.append)
+    tracks = arrange.reconcile(list(source.tracks), saved, corrections, estimates)
+    state = EditorState(playlist_id=playlist_id, source_name=source.name, tracks=tracks)
+
+    def save_fn(
+        editor_state: EditorState, corrections_to_save: dict[str, Correction]
+    ) -> None:
+        store.save_corrections(corrections_to_save)
+        store.save_arrangement(
+            store.arrangement_from_tracks(editor_state.playlist_id, editor_state.tracks)
+        )
+
+    def export_fn(uris: list[str]) -> str:
+        new = spotify.create_playlist(f"{source.name} (edited)")
+        spotify.add_tracks(new.playlist_id, uris)
+        return new.url
+
+    TrackEditorApp(
+        state, corrections, save_fn=save_fn, export_fn=export_fn, warnings=warnings
+    ).run()
+    return _EXIT_OK
+
+
+def _cmd_edit(args: argparse.Namespace) -> int:
+    try:
+        playlist_id = parse_playlist_id(args.playlist)
+    except ValueError as error:
+        display.message(f"[red]{error}[/]")
+        return _EXIT_BAD_INPUT
+    session = auth.load_session()
+    if session is None:
+        display.message("[red]Not logged in. Run the `login` command first.[/]")
+        return _EXIT_NOT_AUTH
+    spotify = SpotifyClient(session.access_token)
+    recco = ReccoBeatsClient()
+    try:
+        return _run_edit(playlist_id, spotify, recco)
+    except (SpotifyError, ReccoBeatsError, auth.AuthError) as error:
+        display.message(f"[red]{error}[/]")
+        return _EXIT_ERROR
+    finally:
+        spotify.close()
+        recco.close()
+
+
 def main(argv: list[str] | None = None) -> int:
     """Return the process exit code."""
     parser = _build_parser()
@@ -154,5 +224,7 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_login()
     if args.command == "sort":
         return _cmd_sort(args)
+    if args.command == "edit":
+        return _cmd_edit(args)
     parser.print_help()
     return _EXIT_OK

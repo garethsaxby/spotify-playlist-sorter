@@ -1,10 +1,10 @@
-"""Tests for the Camelot mapping (all 24 keys + ordering)."""
+"""Tests for the Camelot mapping (all 24 keys + ordering) and code parsing."""
 
 from __future__ import annotations
 
 import pytest
 
-from spotify_playlist_sorter.camelot import to_camelot
+from spotify_playlist_sorter.camelot import parse_camelot, to_camelot
 
 # (key, mode) -> expected Camelot code, from data-model.md.
 _EXPECTED = {
@@ -54,3 +54,23 @@ def test_order_by_number():
 def test_invalid_input_raises(key, mode):
     with pytest.raises(ValueError, match=r"range|mode"):
         to_camelot(key, mode)
+
+
+@pytest.mark.parametrize(
+    ("number", "letter"),
+    [(n, letter) for n in range(1, 13) for letter in ("A", "B")],
+)
+def test_parse_camelot_round_trips_every_code(number, letter):
+    code = f"{number}{letter}"
+    assert parse_camelot(code).code == code
+
+
+@pytest.mark.parametrize(("text", "expected"), [("8b", "8B"), (" 12a ", "12A")])
+def test_parse_camelot_normalises_case_and_whitespace(text, expected):
+    assert parse_camelot(text).code == expected
+
+
+@pytest.mark.parametrize("text", ["13A", "0A", "8Z", "", "8", "A8", "108B"])
+def test_parse_camelot_rejects_invalid(text):
+    with pytest.raises(ValueError, match=r"Camelot code"):
+        parse_camelot(text)

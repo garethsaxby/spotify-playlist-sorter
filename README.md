@@ -35,6 +35,26 @@ confirmation before creating the new playlist. Options: `--yes` (skip the prompt
 Exit codes: `0` ok, `2` bad input, `3` not logged in, `4` not your playlist, `5` nothing
 sortable, `6` write failed (source untouched), `7` fewer than 2 tracks.
 
+### Editing a playlist (interactive)
+
+```sh
+uv run spotify-playlist-sorter edit <playlist-url|uri|id>
+```
+
+Opens a full-screen terminal editor (built with [Textual](https://textual.textualize.io))
+showing every track with its Camelot key, BPM, and a provenance/pin marker
+(`*` corrected, `~` estimated, `?` unknown, `[P]` pinned). The estimator is often wrong or
+missing data, so **you** are the source of truth: correct or add a track's key/BPM and it
+re-places automatically; move a track to pin it in place; save your work locally; and
+export the arrangement to a **new** Spotify playlist (the source is never modified).
+
+In-editor keys: `e` edit key/BPM · `m` move (pin) · `r` full re-sort (clears pins) ·
+`s` save · `x` export · `q` quit (prompts if there are unsaved changes).
+
+Corrections are saved globally (reused for that track in any playlist); the per-playlist
+order is saved separately. Both live as JSON under your user config directory and are
+written atomically. Exit codes match `sort` (`3`/`4`/`7` for auth/ownership/too-few).
+
 ## Quality tooling
 
 This repository enforces strict, centrally-configured code quality:
