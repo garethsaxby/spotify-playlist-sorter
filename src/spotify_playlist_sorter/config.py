@@ -14,7 +14,6 @@ SCOPES = (
     "playlist-read-collaborative",
     "playlist-modify-public",
     "playlist-modify-private",
-    "user-read-private",  # gives the token a country so playlist tracks aren't nulled
 )
 
 # Fixed loopback redirect; MUST match the URI registered in the Spotify app.

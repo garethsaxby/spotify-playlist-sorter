@@ -103,8 +103,8 @@ def _run_sort(
     spotify: SpotifyClient,
     recco: ReccoBeatsClient,
 ) -> int:
-    user_id, country = spotify.current_user()
-    source = spotify.get_playlist(playlist_id, country)
+    user_id = spotify.current_user_id()
+    source = spotify.get_playlist(playlist_id)
     if source.owner_id != user_id:
         display.message("[red]You can only sort playlists you own.[/]")
         return _EXIT_NOT_OWNED

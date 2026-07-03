@@ -104,17 +104,11 @@ class SpotifyClient:
             return response
         raise SpotifyError(f"{method} {path} rate-limited after retries")
 
-    def current_user(self) -> tuple[str, str]:
-        """Return ``(user_id, country)``; country is "" if unavailable."""
+    def current_user_id(self) -> str:
         data = self._request("GET", "/me").json()
-        if not isinstance(data, dict):
-            raise SpotifyError("unexpected /me response shape")
-        mapping = cast("dict[str, object]", data)
-        user_id = _as_str(_require(mapping, "id"))
-        country = mapping.get("country")
-        return user_id, country if isinstance(country, str) else ""
+        return _as_str(_require(data, "id"))
 
-    def get_playlist(self, playlist_id: str, market: str = "") -> SourcePlaylist:
+    def get_playlist(self, playlist_id: str) -> SourcePlaylist:
         """Read name/owner and all tracks for a playlist.
 
         Metadata comes from GET /playlists/{id} (fields-limited); the tracks come
@@ -122,17 +116,16 @@ class SpotifyClient:
         endpoint, whose ``next`` links stay on /items so playlists over 100 tracks
         page correctly (the deprecated /tracks endpoint returns 403 for new apps).
         """
-        name, owner_id = self._get_meta(playlist_id, market)
-        tracks = self._get_items(playlist_id, market)
+        name, owner_id = self._get_meta(playlist_id)
+        tracks = self._get_items(playlist_id)
         return SourcePlaylist(
             playlist_id=playlist_id, name=name, owner_id=owner_id, tracks=tracks
         )
 
-    def _get_meta(self, playlist_id: str, market: str) -> tuple[str, str]:
-        params = {"fields": "name,owner(id)"}
-        if market:
-            params["market"] = market
-        data = self._request("GET", f"/playlists/{playlist_id}", params=params).json()
+    def _get_meta(self, playlist_id: str) -> tuple[str, str]:
+        data = self._request(
+            "GET", f"/playlists/{playlist_id}", params={"fields": "name,owner(id)"}
+        ).json()
         if not isinstance(data, dict):
             raise SpotifyError("unexpected playlist response shape")
         mapping = cast("dict[str, object]", data)
@@ -140,12 +133,11 @@ class SpotifyClient:
         owner_id = _as_str(_require(_require(mapping, "owner"), "id"))
         return name, owner_id
 
-    def _get_items(self, playlist_id: str, market: str) -> tuple[Track, ...]:
-        params = {"limit": str(_PAGE_LIMIT), "offset": "0"}
-        if market:
-            params["market"] = market
+    def _get_items(self, playlist_id: str) -> tuple[Track, ...]:
         first = self._request(
-            "GET", f"/playlists/{playlist_id}/items", params=params
+            "GET",
+            f"/playlists/{playlist_id}/items",
+            params={"limit": str(_PAGE_LIMIT), "offset": "0"},
         ).json()
         return self._collect_tracks(first)
 
