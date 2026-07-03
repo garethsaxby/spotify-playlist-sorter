@@ -2,11 +2,19 @@
 name = "spotify-playlist-sorter"
 version = "0.1.0"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "httpx>=0.28.1",
+    "platformdirs>=4.10.0",
+    "rich>=15.0.0",
+]
+
+[project.scripts]
+spotify-playlist-sorter = "spotify_playlist_sorter.cli:main"
 
 [dependency-groups]
 dev = [
     "pre-commit>=4.6.0",
+    "pytest>=9.1.1",
     "ruff>=0.15.20",
     "ty>=0.0.56",
 ]
@@ -39,10 +47,22 @@ ignore = [
     "ISC001", # single-line implicit string concatenation — formatter-owned
     "ISC002", # multi-line implicit string concatenation — formatter-owned
     # --- Project set: intentionally disabled (research.md D1) ---
-    "D",   # pydocstyle — docstrings-everywhere is premature on a near-empty baseline
-    "CPY", # flake8-copyright — no copyright-header policy for this repo
-    "TD",  # flake8-todos — TODO comments are permitted, not merge blockers
-    "FIX", # flake8-fixme — FIXME/TODO markers are permitted
+    "D",      # pydocstyle — docstrings-everywhere is premature on a near-empty baseline
+    "CPY",    # flake8-copyright — no copyright-header policy for this repo
+    "TD",     # flake8-todos — TODO comments are permitted, not merge blockers
+    "FIX",    # flake8-fixme — FIXME/TODO markers are permitted
+    "TRY003", # allow descriptive messages passed to raised exceptions
+    "EM",     # allow inline exception messages (readable; not assigned to a temp var)
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests legitimately use patterns that some strict rules flag (justified — FR-008).
+"tests/**" = [
+    "S101",    # assert is the pytest idiom
+    "ANN",     # type annotations not required in test bodies
+    "PLR2004", # magic values are fine in test expectations
+    "INP001",  # tests/ is intentionally not an importable package
+    "SLF001",  # tests may access internals
 ]
 
 [tool.ruff.format]
@@ -64,3 +84,10 @@ exclude = [".venv", "build", "dist", "__pycache__"]
 # errors here as well. Individual findings may be downgraded ONLY with a justification
 # comment (FR-008); none are currently downgraded.
 possibly-unresolved-reference = "error"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/spotify_playlist_sorter"]

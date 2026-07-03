@@ -1,6 +1,39 @@
 # spotify-playlist-sorter
 
-A tool for sorting Spotify playlists.
+A command-line tool that sorts one of your Spotify playlists by **Camelot key then BPM**
+and writes the result to a **new** playlist (the source is never modified). Track key/BPM
+come from the free [ReccoBeats](https://reccobeats.com) API; the sorted playlist is a
+harmonic-mixing "library" to pick tracks from.
+
+## Usage
+
+### One-time setup
+
+1. Create a Spotify app at the [developer dashboard](https://developer.spotify.com/dashboard)
+   and add the redirect URI **`http://127.0.0.1:8080/callback`** (must match exactly).
+2. Export its client id and install the tool:
+
+   ```sh
+   export SPOTIFY_CLIENT_ID=<your app client id>
+   uv sync
+   uv run spotify-playlist-sorter login   # opens a browser; caches a refresh token
+   ```
+
+The refresh token is stored in a user-only (`0600`) file under your OS config directory
+(`platformdirs`), never in the repo and never printed.
+
+### Sorting a playlist
+
+```sh
+uv run spotify-playlist-sorter sort <playlist-url|uri|id>
+```
+
+It prints the proposed order (Camelot + BPM, unsortable tracks listed last) and asks for
+confirmation before creating the new playlist. Options: `--yes` (skip the prompt),
+`--name <text>` (name the new playlist), `--public` (default is private).
+
+Exit codes: `0` ok, `2` bad input, `3` not logged in, `4` not your playlist, `5` nothing
+sortable, `6` write failed (source untouched), `7` fewer than 2 tracks.
 
 ## Quality tooling
 
