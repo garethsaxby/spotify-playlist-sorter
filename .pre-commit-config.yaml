@@ -1,0 +1,26 @@
+# Runs the same strict checks as `just check` on staged changes.
+# Hook tool versions come from the locked `dev` dependency group via `uv run`
+# (a single source of truth — no separately pinned hook revisions).
+# One-time setup: `uv run pre-commit install`.
+repos:
+  - repo: local
+    hooks:
+      - id: ruff-lint
+        name: ruff lint (safe fixes)
+        entry: uv run ruff check --fix
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+      - id: ty
+        name: ty type check
+        entry: uv run ty check --error-on-warning
+        language: system
+        types_or: [python, pyi]
+        pass_filenames: false
+        require_serial: true
