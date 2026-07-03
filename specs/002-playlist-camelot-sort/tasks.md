@@ -27,9 +27,9 @@ part of every implementation task, not a separate step.
 
 **Purpose**: Add dependencies and the package skeleton so `just check` runs over real code.
 
-- [ ] T001 Add runtime deps `httpx`, `rich`, `platformdirs` to `[project.dependencies]` and dev dep `pytest` (via `uv add` / `uv add --dev`), and declare the entry point `[project.scripts]` `spotify-playlist-sorter = "spotify_playlist_sorter.cli:main"` in `pyproject.toml` — research.md D6
-- [ ] T002 Create the package skeleton: `src/spotify_playlist_sorter/__init__.py`, `src/spotify_playlist_sorter/__main__.py` (calls `cli.main()`), and an empty `tests/` package; confirm `uv sync` and `just check` pass on the skeleton — plan.md Project Structure
-- [ ] T003 [P] Add a `check`-adjacent `test` recipe (`uv run pytest`) to the `Justfile` under the `qa` group — research.md D10
+- [X] T001 Add runtime deps `httpx`, `rich`, `platformdirs` to `[project.dependencies]` and dev dep `pytest` (via `uv add` / `uv add --dev`), and declare the entry point `[project.scripts]` `spotify-playlist-sorter = "spotify_playlist_sorter.cli:main"` in `pyproject.toml` — research.md D6
+- [X] T002 Create the package skeleton: `src/spotify_playlist_sorter/__init__.py`, `src/spotify_playlist_sorter/__main__.py` (calls `cli.main()`), and an empty `tests/` package; confirm `uv sync` and `just check` pass on the skeleton — plan.md Project Structure
+- [X] T003 [P] Add a `check`-adjacent `test` recipe (`uv run pytest`) to the `Justfile` under the `qa` group — research.md D10
 
 **Checkpoint**: `just check` and `just test` run (test suite empty) against the new package.
 
@@ -39,16 +39,16 @@ part of every implementation task, not a separate step.
 
 **Purpose**: Shared domain types, pure logic, config, auth, and the base HTTP/URL layer that every story needs.
 
-- [ ] T004 [P] Define domain dataclasses in `src/spotify_playlist_sorter/models.py`: `Track`, `AudioFeatures`, `CamelotKey`, `ProposedOrder`, `SourcePlaylist`, `NewPlaylist`, `AuthToken` — data-model.md
-- [ ] T005 [P] Implement `src/spotify_playlist_sorter/config.py`: per-user config dir via `platformdirs`, `client_id` load (env/config), OAuth scopes, and the `0600` token-file path — research.md D7
-- [ ] T006 [P] Implement `src/spotify_playlist_sorter/camelot.py`: `(key, mode) -> CamelotKey` using the 24-entry table, plus the `(number, A<B)` ordering key — data-model.md, research.md D2
-- [ ] T007 [P] Write `tests/test_camelot.py`: assert all 24 key/mode → Camelot codes and that ordering yields 1A,1B,…,12B — data-model.md
-- [ ] T008 Implement `src/spotify_playlist_sorter/sorter.py`: build the sort key `(camelot order, bpm, position)`, order sortable tracks, append unsortable (features is None/invalid) last in original order, guarantee the output multiset equals the input (depends on T004, T006) — research.md D3, FR-010
-- [ ] T009 [P] Write `tests/test_sorter.py`: ordering, BPM-within-key, stable ties, unsortable-to-end, and multiset preservation (property test) (depends on T008) — spec SC-002/SC-004
-- [ ] T010 Implement `src/spotify_playlist_sorter/spotify.py` base: playlist URL/URI/bare-ID parsing + a typed `httpx` client wrapper (auth header injection, JSON validation, HTTP error + 429 `Retry-After` backoff); unparseable/non-playlist input is rejected (exit 2) (depends on T004, T005) — research.md D8/D9, contracts/cli.md
-- [ ] T011 [P] Write `tests/test_url.py`: parse playlist URL, `spotify:playlist:` URI, and bare ID; reject non-playlist/garbage input (depends on T010) — contracts/cli.md
-- [ ] T012 Implement `src/spotify_playlist_sorter/auth.py`: OAuth Authorization Code + PKCE (open browser, loopback listener on `127.0.0.1:{port}/callback`, code→token exchange, refresh), caching the refresh token to the `0600` file; never log tokens (depends on T005) — research.md D4/D7, FR-017
-- [ ] T013 Implement `src/spotify_playlist_sorter/cli.py` with the `argparse` skeleton and the `login` command wired to `auth.py`, plus `main()` used by `__main__.py` (depends on T012, T002) — contracts/cli.md
+- [X] T004 [P] Define domain dataclasses in `src/spotify_playlist_sorter/models.py`: `Track`, `AudioFeatures`, `CamelotKey`, `ProposedOrder`, `SourcePlaylist`, `NewPlaylist`, `AuthToken` — data-model.md
+- [X] T005 [P] Implement `src/spotify_playlist_sorter/config.py`: per-user config dir via `platformdirs`, `client_id` load (env/config), OAuth scopes, and the `0600` token-file path — research.md D7
+- [X] T006 [P] Implement `src/spotify_playlist_sorter/camelot.py`: `(key, mode) -> CamelotKey` using the 24-entry table, plus the `(number, A<B)` ordering key — data-model.md, research.md D2
+- [X] T007 [P] Write `tests/test_camelot.py`: assert all 24 key/mode → Camelot codes and that ordering yields 1A,1B,…,12B — data-model.md
+- [X] T008 Implement `src/spotify_playlist_sorter/sorter.py`: build the sort key `(camelot order, bpm, position)`, order sortable tracks, append unsortable (features is None/invalid) last in original order, guarantee the output multiset equals the input (depends on T004, T006) — research.md D3, FR-010
+- [X] T009 [P] Write `tests/test_sorter.py`: ordering, BPM-within-key, stable ties, unsortable-to-end, and multiset preservation (property test) (depends on T008) — spec SC-002/SC-004
+- [X] T010 Implement `src/spotify_playlist_sorter/spotify.py` base: playlist URL/URI/bare-ID parsing + a typed `httpx` client wrapper (auth header injection, JSON validation, HTTP error + 429 `Retry-After` backoff); unparseable/non-playlist input is rejected (exit 2) (depends on T004, T005) — research.md D8/D9, contracts/cli.md
+- [X] T011 [P] Write `tests/test_url.py`: parse playlist URL, `spotify:playlist:` URI, and bare ID; reject non-playlist/garbage input (depends on T010) — contracts/cli.md
+- [X] T012 Implement `src/spotify_playlist_sorter/auth.py`: OAuth Authorization Code + PKCE (open browser, loopback listener on `127.0.0.1:{port}/callback`, code→token exchange, refresh), caching the refresh token to the `0600` file; never log tokens (depends on T005) — research.md D4/D7, FR-017
+- [X] T013 Implement `src/spotify_playlist_sorter/cli.py` with the `argparse` skeleton and the `login` command wired to `auth.py`, plus `main()` used by `__main__.py` (depends on T012, T002) — contracts/cli.md
 
 **Checkpoint**: `uv run spotify-playlist-sorter login` completes OAuth and caches a token; domain logic is unit-tested.
 
@@ -60,12 +60,12 @@ part of every implementation task, not a separate step.
 
 **Independent Test**: Run `sort <owned-url>` and answer "N" — a correct table prints and the source is unchanged; a non-owned URL is refused.
 
-- [ ] T014 [US1] Implement `src/spotify_playlist_sorter/reccobeats.py`: batch `GET /v1/audio-features?ids=` (≤40 IDs), map results back by `href` → Spotify ID, missing/invalid → `features=None`; handle `content: []` and 429 (depends on T004) — research.md D1, contracts/external-apis.md
-- [ ] T015 [P] [US1] Write `tests/test_reccobeats.py`: parse a real-shaped response, and confirm partial results + `content: []` map to the correct tracks/unsortable (depends on T014) — spec SC-007
-- [ ] T016 [US1] Add read methods to `src/spotify_playlist_sorter/spotify.py`: `get_me()`, `get_playlist()` (name, owner_id), `get_playlist_tracks()` paginated 100/page (depends on T010) — contracts/external-apis.md, FR-004
-- [ ] T017 [P] [US1] Implement `src/spotify_playlist_sorter/display.py`: a `rich` table of a `ProposedOrder` (# , Title — Artists, Camelot, BPM) with unsortable tracks under a clear "unsorted" marker (depends on T004) — contracts/cli.md, NFR-002
-- [ ] T018 [US1] Add the `sort <playlist>` preview path to `src/spotify_playlist_sorter/cli.py`: parse → auth → read source → ownership check (refuse if not owned, exit 4; bad input exit 2; not-authenticated exit 3) → if the playlist has < 2 tracks, report "nothing to sort" and exit 7 (no write) → ReccoBeats features → Camelot → sort → display; make NO write (depends on T013, T014, T016, T017, T008) — FR-001/002/003/007/019, US1
-- [ ] T019 [US1] Verify US1 against quickstart.md Scenarios 1, 2, 4 (preview order correct; source unchanged; non-owned refused) (depends on T018) — SC-001/SC-002/SC-005
+- [X] T014 [US1] Implement `src/spotify_playlist_sorter/reccobeats.py`: batch `GET /v1/audio-features?ids=` (≤40 IDs), map results back by `href` → Spotify ID, missing/invalid → `features=None`; handle `content: []` and 429 (depends on T004) — research.md D1, contracts/external-apis.md
+- [X] T015 [P] [US1] Write `tests/test_reccobeats.py`: parse a real-shaped response, and confirm partial results + `content: []` map to the correct tracks/unsortable (depends on T014) — spec SC-007
+- [X] T016 [US1] Add read methods to `src/spotify_playlist_sorter/spotify.py`: `get_me()`, `get_playlist()` (name, owner_id), `get_playlist_tracks()` paginated 100/page (depends on T010) — contracts/external-apis.md, FR-004
+- [X] T017 [P] [US1] Implement `src/spotify_playlist_sorter/display.py`: a `rich` table of a `ProposedOrder` (# , Title — Artists, Camelot, BPM) with unsortable tracks under a clear "unsorted" marker (depends on T004) — contracts/cli.md, NFR-002
+- [X] T018 [US1] Add the `sort <playlist>` preview path to `src/spotify_playlist_sorter/cli.py`: parse → auth → read source → ownership check (refuse if not owned, exit 4; bad input exit 2; not-authenticated exit 3) → if the playlist has < 2 tracks, report "nothing to sort" and exit 7 (no write) → ReccoBeats features → Camelot → sort → display; make NO write (depends on T013, T014, T016, T017, T008) — FR-001/002/003/007/019, US1
+- [X] T019 [US1] Verify US1 against quickstart.md Scenarios 1, 2, 4 (preview order correct; source unchanged; non-owned refused) (depends on T018) — SC-001/SC-002/SC-005
 
 **Checkpoint**: MVP — a correct, read-only harmonic preview works end to end.
 
@@ -77,9 +77,9 @@ part of every implementation task, not a separate step.
 
 **Independent Test**: From a preview, confirm — a new playlist appears with the approved order and the same track set; the source is unchanged; declining writes nothing.
 
-- [ ] T020 [US2] Add write methods to `src/spotify_playlist_sorter/spotify.py`: `create_playlist(user_id, name)` and `add_tracks(playlist_id, uris)` batching 100 URIs/request in order (depends on T016) — contracts/external-apis.md, FR-009
-- [ ] T021 [US2] Add the confirmation gate + write path to `src/spotify_playlist_sorter/cli.py`: prompt (`rich` Confirm) unless `--yes`; on confirm, ensure a valid/refreshed token, then create the new playlist (private by default; name `"{source} (Camelot sorted)"`, or `--name`), add tracks in order, print summary (`N sorted, M unsorted`) + new playlist URL; on decline make no change; on a create/add failure, leave the source untouched, report the error and name the incomplete new playlist (exit 6); the write uses the tracks read during this run (depends on T018, T020) — FR-008/009/011/014/015/016, US2
-- [ ] T022 [US2] Verify US2 against quickstart.md Scenario 3 (new playlist has same multiset in sorted order; source unchanged; decline = no write; and simulate a create/add failure to confirm the source stays unchanged and the incomplete playlist is named) (depends on T021) — SC-003/SC-004/SC-008
+- [X] T020 [US2] Add write methods to `src/spotify_playlist_sorter/spotify.py`: `create_playlist(user_id, name)` and `add_tracks(playlist_id, uris)` batching 100 URIs/request in order (depends on T016) — contracts/external-apis.md, FR-009
+- [X] T021 [US2] Add the confirmation gate + write path to `src/spotify_playlist_sorter/cli.py`: prompt (`rich` Confirm) unless `--yes`; on confirm, ensure a valid/refreshed token, then create the new playlist (private by default; name `"{source} (Camelot sorted)"`, or `--name`), add tracks in order, print summary (`N sorted, M unsorted`) + new playlist URL; on decline make no change; on a create/add failure, leave the source untouched, report the error and name the incomplete new playlist (exit 6); the write uses the tracks read during this run (depends on T018, T020) — FR-008/009/011/014/015/016, US2
+- [X] T022 [US2] Verify US2 against quickstart.md Scenario 3 (new playlist has same multiset in sorted order; source unchanged; decline = no write; and simulate a create/add failure to confirm the source stays unchanged and the incomplete playlist is named) (depends on T021) — SC-003/SC-004/SC-008
 
 **Checkpoint**: The full preview → confirm → new-playlist flow works non-destructively.
 
@@ -91,9 +91,9 @@ part of every implementation task, not a separate step.
 
 **Independent Test**: Preview a mixed playlist — unsortable tracks appear last, flagged, and are still copied on confirm; a fully-unsortable playlist reports and creates nothing.
 
-- [ ] T023 [US3] Wire the fully-unsortable case in `src/spotify_playlist_sorter/cli.py`: if no track has determinable key/BPM, report and exit 5 with no write; ensure unsortable tracks are still included (last) when writing (depends on T018, T014, T008) — FR-012/FR-013
-- [ ] T024 [P] [US3] Add tests for mixed and all-unsortable inputs (unsortable-to-end retained; all-unsortable → FR-013) in `tests/test_sorter.py`/`tests/test_reccobeats.py` (depends on T008, T014) — SC-007
-- [ ] T025 [US3] Verify US3 against quickstart.md Scenario 5 (mixed + all-unsortable) (depends on T023) — SC-007, FR-013
+- [X] T023 [US3] Wire the fully-unsortable case in `src/spotify_playlist_sorter/cli.py`: if no track has determinable key/BPM, report and exit 5 with no write; ensure unsortable tracks are still included (last) when writing (depends on T018, T014, T008) — FR-012/FR-013
+- [X] T024 [P] [US3] Add tests for mixed and all-unsortable inputs (unsortable-to-end retained; all-unsortable → FR-013) in `tests/test_sorter.py`/`tests/test_reccobeats.py` (depends on T008, T014) — SC-007
+- [X] T025 [US3] Verify US3 against quickstart.md Scenario 5 (mixed + all-unsortable) (depends on T023) — SC-007, FR-013
 
 **Checkpoint**: The tool is robust on messy real-world playlists.
 
@@ -101,9 +101,9 @@ part of every implementation task, not a separate step.
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T026 [P] Review and harden 429/`Retry-After` backoff and user-facing error messages across `src/spotify_playlist_sorter/spotify.py` and `reccobeats.py` (network/HTTP errors surface clearly; no credential leakage) (depends on T010, T014, T020) — FR-016/FR-017, Principle I/V
-- [ ] T027 [P] Document usage in `README.md`: the `login` and `sort` commands, Spotify app setup (register app, `client_id`, loopback redirect URI), and where the token is cached — contracts/cli.md (onboarding/setup)
-- [ ] T028 Run `just check` and `just test` green across the feature, then execute the full `quickstart.md` (Scenarios 1–6) end to end, confirming a 100-track preview under 60s (depends on all prior) — SC-006, Constitution III/IV
+- [X] T026 [P] Review and harden 429/`Retry-After` backoff and user-facing error messages across `src/spotify_playlist_sorter/spotify.py` and `reccobeats.py` (network/HTTP errors surface clearly; no credential leakage) (depends on T010, T014, T020) — FR-016/FR-017, Principle I/V
+- [X] T027 [P] Document usage in `README.md`: the `login` and `sort` commands, Spotify app setup (register app, `client_id`, loopback redirect URI), and where the token is cached — contracts/cli.md (onboarding/setup)
+- [X] T028 Run `just check` and `just test` green across the feature, then execute the full `quickstart.md` (Scenarios 1–6) end to end, confirming a 100-track preview under 60s (depends on all prior) — SC-006, Constitution III/IV
 
 ---
 

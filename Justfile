@@ -36,6 +36,11 @@ fix:
 typecheck:
     uv run ty check --error-on-warning
 
+# Run the unit tests
+[group('qa')]
+test:
+    uv run pytest
+
 # Aggregate quality gate (lint + format-check + type check); fail-fast, CI-gateable
 [group('qa')]
 check: lint format-check typecheck
