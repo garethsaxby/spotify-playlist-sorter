@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import re
+
 from .models import CamelotKey
 
 PITCH_CLASS_COUNT = 12
+
+_CODE_RE = re.compile(r"^(1[0-2]|[1-9])([AB])$")
 
 # Wheel number for each pitch class (index 0=C .. 11=B), by mode.
 _MAJOR_NUMBERS = (8, 3, 10, 5, 12, 7, 2, 9, 4, 11, 6, 1)
@@ -29,3 +33,15 @@ def to_camelot(key: int, mode: int) -> CamelotKey:
         return CamelotKey(number=_MINOR_NUMBERS[key], letter="A")
     msg = f"mode must be 0 or 1: {mode}"
     raise ValueError(msg)
+
+
+def parse_camelot(code: str) -> CamelotKey:
+    """Parse a Camelot code (case-insensitive, 1A-12B) into a ``CamelotKey``.
+
+    Raises ``ValueError`` for anything outside 1A-12B so callers can reject it.
+    """
+    match = _CODE_RE.match(code.strip().upper())
+    if match is None:
+        msg = f"not a Camelot code (1A-12B): {code!r}"
+        raise ValueError(msg)
+    return CamelotKey(number=int(match.group(1)), letter=match.group(2))

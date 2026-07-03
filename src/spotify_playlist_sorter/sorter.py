@@ -2,7 +2,19 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from .models import ProposedOrder, Track
+
+if TYPE_CHECKING:
+    from .models import CamelotKey
+
+
+def sort_key(
+    camelot: CamelotKey, tempo: float, position: int
+) -> tuple[int, int, float, int]:
+    """Camelot-then-BPM ordering key; reused by ``arrange`` (feature 003)."""
+    return (*camelot.order, tempo, position)
 
 
 def _sort_key(track: Track) -> tuple[int, int, float, int]:
@@ -10,7 +22,7 @@ def _sort_key(track: Track) -> tuple[int, int, float, int]:
     if features is None:  # pragma: no cover - guarded by caller
         msg = "sortable track must have features"
         raise ValueError(msg)
-    return (*features.camelot.order, features.tempo, track.position)
+    return sort_key(features.camelot, features.tempo, track.position)
 
 
 def build_proposed_order(tracks: list[Track]) -> ProposedOrder:

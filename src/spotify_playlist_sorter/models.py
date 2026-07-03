@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Literal
+
+Provenance = Literal["corrected", "estimated", "unknown"]
 
 
 @dataclass(frozen=True)
@@ -82,3 +85,51 @@ class AuthToken:
     access_token: str
     refresh_token: str
     expires_at: float
+
+
+@dataclass(frozen=True)
+class EditableTrack:
+    """A track being edited: resolved key/BPM, provenance, and pin state."""
+
+    spotify_id: str
+    uri: str
+    title: str
+    artists: tuple[str, ...]
+    source_position: int
+    camelot: CamelotKey | None
+    bpm: float | None
+    provenance: Provenance
+    pinned: bool
+
+    @property
+    def sortable(self) -> bool:
+        """True iff both key and BPM are set, so the track can be ordered."""
+        return self.camelot is not None and self.bpm is not None
+
+
+@dataclass(frozen=True)
+class Correction:
+    """A user-supplied key/BPM override for one track, keyed globally by id."""
+
+    camelot: CamelotKey
+    bpm: float
+
+
+@dataclass(frozen=True)
+class Arrangement:
+    """A saved order (track ids, duplicates repeat) plus pinned positions."""
+
+    version: int
+    playlist_id: str
+    order: tuple[str, ...]
+    pinned: tuple[int, ...]
+
+
+@dataclass
+class EditorState:
+    """Mutable in-session editor state: the current tracks and dirty flag."""
+
+    playlist_id: str
+    source_name: str
+    tracks: list[EditableTrack]
+    dirty: bool = False

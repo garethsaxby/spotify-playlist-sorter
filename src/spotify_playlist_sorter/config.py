@@ -37,6 +37,23 @@ def token_file() -> Path:
     return config_dir() / "token.json"
 
 
+def corrections_file() -> Path:
+    """Path to the global per-track corrections store."""
+    return config_dir() / "corrections.json"
+
+
+def arrangements_dir() -> Path:
+    """Return (creating if needed) the per-playlist arrangements directory."""
+    path = config_dir() / "arrangements"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def arrangement_file(playlist_id: str) -> Path:
+    """Path to the saved arrangement file for one playlist."""
+    return arrangements_dir() / f"{playlist_id}.json"
+
+
 def client_id() -> str:
     """Return the Spotify client id from the environment, or raise."""
     value = os.environ.get(_CLIENT_ID_ENV)
